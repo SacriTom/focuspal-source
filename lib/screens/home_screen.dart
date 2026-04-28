@@ -332,7 +332,17 @@ class _RoomColumn extends StatelessWidget {
               ),
             ),
           ),
-          // Furniture, anchored on the floor
+          // Wall decoration (high on the wall, room-specific).
+          Align(
+            alignment: const Alignment(0.0, -0.55),
+            child: _WallDecoration(room: room, isActive: isActive),
+          ),
+          // Floor accessory (rug / coffee table / extra cabinet).
+          Align(
+            alignment: const Alignment(0.0, 0.85),
+            child: _FloorAccessory(room: room, isActive: isActive),
+          ),
+          // Main furniture, anchored on the floor.
           Align(
             alignment: const Alignment(0.0, 0.55),
             child: _RoomFurniture(room: room, isActive: isActive),
@@ -479,6 +489,300 @@ class _KitchenCounterShape extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Higher-on-the-wall decorative elements that further distinguish the
+/// rooms (A3 polish layer over A2 furniture geometry). Bedroom: a window
+/// with a moon. Kitchen: a wall clock. Living room: a framed picture.
+class _WallDecoration extends StatelessWidget {
+  final _HomeRoom room;
+  final bool isActive;
+  const _WallDecoration({required this.room, required this.isActive});
+
+  @override
+  Widget build(BuildContext context) {
+    final dim = isActive ? 1.0 : 0.55;
+    switch (room) {
+      case _HomeRoom.bedroom:
+        return Opacity(opacity: dim, child: const _BedroomWindow());
+      case _HomeRoom.kitchen:
+        return Opacity(opacity: dim, child: const _KitchenClock());
+      case _HomeRoom.livingRoom:
+        return Opacity(opacity: dim, child: const _LivingRoomPicture());
+    }
+  }
+}
+
+/// Floor-level accessory: rug under the bed, low cabinet in the kitchen,
+/// coffee table in the living room.
+class _FloorAccessory extends StatelessWidget {
+  final _HomeRoom room;
+  final bool isActive;
+  const _FloorAccessory({required this.room, required this.isActive});
+
+  @override
+  Widget build(BuildContext context) {
+    final dim = isActive ? 1.0 : 0.5;
+    switch (room) {
+      case _HomeRoom.bedroom:
+        return Opacity(opacity: dim, child: const _BedroomRug());
+      case _HomeRoom.kitchen:
+        return Opacity(opacity: dim, child: const _KitchenCabinet());
+      case _HomeRoom.livingRoom:
+        return Opacity(opacity: dim, child: const _CoffeeTable());
+    }
+  }
+}
+
+class _BedroomWindow extends StatelessWidget {
+  const _BedroomWindow();
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 70,
+      height: 50,
+      decoration: BoxDecoration(
+        color: const Color(0xFF1B2742),
+        border: Border.all(color: const Color(0xFF8C7A5C), width: 3),
+      ),
+      child: Stack(
+        children: [
+          // Moon
+          const Positioned(
+            top: 6,
+            right: 8,
+            child: SizedBox(
+              width: 14,
+              height: 14,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Color(0xFFFFF1A8),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ),
+          // Window cross frame
+          Center(
+            child: Container(
+              width: 1.5,
+              color: const Color(0xFF8C7A5C),
+            ),
+          ),
+          Center(
+            child: Container(
+              height: 1.5,
+              color: const Color(0xFF8C7A5C),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _KitchenClock extends StatelessWidget {
+  const _KitchenClock();
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5E6C8),
+        shape: BoxShape.circle,
+        border: Border.all(color: const Color(0xFF6B4F2C), width: 2),
+      ),
+      child: Stack(
+        children: [
+          // Hour hand
+          Center(
+            child: Transform.rotate(
+              angle: -0.6,
+              child: Container(
+                width: 2,
+                height: 10,
+                color: const Color(0xFF6B4F2C),
+              ),
+            ),
+          ),
+          // Minute hand
+          Center(
+            child: Transform.rotate(
+              angle: 1.4,
+              child: Container(
+                width: 1.5,
+                height: 14,
+                color: const Color(0xFF6B4F2C),
+              ),
+            ),
+          ),
+          // Centre pin
+          const Center(
+            child: SizedBox(
+              width: 4,
+              height: 4,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Color(0xFF6B4F2C),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LivingRoomPicture extends StatelessWidget {
+  const _LivingRoomPicture();
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 56,
+      height: 40,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1D4A0),
+        border: Border.all(color: const Color(0xFF7A4F2C), width: 3),
+      ),
+      child: Stack(
+        children: [
+          // Sky
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            child: Container(
+              height: 18,
+              color: const Color(0xFF8FB6D9),
+            ),
+          ),
+          // Hills
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              height: 18,
+              color: const Color(0xFF7A9C5B),
+            ),
+          ),
+          // Sun
+          const Positioned(
+            top: 4,
+            right: 6,
+            child: SizedBox(
+              width: 8,
+              height: 8,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Color(0xFFFFCD52),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BedroomRug extends StatelessWidget {
+  const _BedroomRug();
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 110,
+      height: 12,
+      decoration: BoxDecoration(
+        color: const Color(0xFF8B3A3A),
+        borderRadius: BorderRadius.circular(2),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: List.generate(
+          5,
+          (_) => Container(
+            width: 4,
+            height: 6,
+            color: const Color(0xFFD4A26A),
+            margin: const EdgeInsets.symmetric(vertical: 3),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _KitchenCabinet extends StatelessWidget {
+  const _KitchenCabinet();
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 70,
+      height: 14,
+      decoration: BoxDecoration(
+        color: const Color(0xFF8C5E2A),
+        border: Border.all(color: Colors.black54),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: List.generate(
+          3,
+          (_) => Container(
+            width: 2,
+            height: 4,
+            color: const Color(0xFFFFD580),
+            margin: const EdgeInsets.symmetric(vertical: 4),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CoffeeTable extends StatelessWidget {
+  const _CoffeeTable();
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 70,
+      height: 14,
+      child: Stack(
+        children: [
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            child: Container(
+              height: 5,
+              decoration: BoxDecoration(
+                color: const Color(0xFF6B4F2C),
+                border: Border.all(color: Colors.black54, width: 0.5),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          // Legs
+          Positioned(
+            left: 6,
+            top: 5,
+            child: Container(width: 2, height: 8,
+                color: const Color(0xFF4F3920)),
+          ),
+          Positioned(
+            right: 6,
+            top: 5,
+            child: Container(width: 2, height: 8,
+                color: const Color(0xFF4F3920)),
           ),
         ],
       ),
