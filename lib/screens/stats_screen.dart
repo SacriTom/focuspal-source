@@ -58,7 +58,21 @@ class _StatsScreenState extends State<StatsScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
+                  // First-launch hero: friendlier than three '0' tiles when
+                  // there's no history yet. Disappears once any data exists.
+                  if (_todayMinutes == 0 &&
+                      _streak == 0 &&
+                      _moodHistory.isEmpty)
+                    const _FirstJourneyHero(),
+                  if (_todayMinutes == 0 &&
+                      _streak == 0 &&
+                      _moodHistory.isEmpty)
+                    const SizedBox(height: 16),
+                  if (!(_todayMinutes == 0 &&
+                      _streak == 0 &&
+                      _moodHistory.isEmpty))
+                    const SizedBox(height: 8),
                   // Today's focus
                   _StatCard(
                     title: "Today's Focus",
@@ -229,6 +243,63 @@ class _StatCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           child,
+        ],
+      ),
+    );
+  }
+}
+
+class _FirstJourneyHero extends StatelessWidget {
+  const _FirstJourneyHero();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.amber.withValues(alpha: 0.20),
+            Colors.amber.withValues(alpha: 0.05),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.amber.withValues(alpha: 0.35),
+          width: 1.5,
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.auto_awesome,
+              color: Colors.amber, size: 36),
+          const SizedBox(width: 14),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'First adventure starts your journey',
+                  style: TextStyle(
+                    color: Colors.amber,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Sessions, streaks and your Chibi’s mood history will fill in here as you focus.',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 13,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

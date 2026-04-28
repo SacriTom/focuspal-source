@@ -38,6 +38,35 @@ class SettingsScreen extends StatelessWidget {
               selected: settings.preset,
               onSelect: (preset) => settings.setPreset(preset),
             ),
+            const SizedBox(height: 8),
+            // Friendly Chibi-voice description of the active preset.
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: Padding(
+                key: ValueKey(settings.preset),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.format_quote,
+                      size: 14,
+                      color: Colors.amber.withValues(alpha: 0.7),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        settings.preset.description,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.65),
+                          fontSize: 13,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 24),
 
             // Fine-tune (expandable)
