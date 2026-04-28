@@ -70,18 +70,37 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // App icon
+                // Splash logo: a neutral egg from the asset set so the
+                // very first frame already speaks the bond/hatch language
+                // of FocusPal, instead of the previous generic paw glyph.
                 Container(
-                  width: 120,
-                  height: 120,
+                  width: 130,
+                  height: 130,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
+                    gradient: RadialGradient(
+                      colors: [
+                        Colors.white.withValues(alpha: 0.18),
+                        Colors.white.withValues(alpha: 0.0),
+                      ],
+                      radius: 0.7,
+                    ),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.pets,
-                    size: 64,
-                    color: Colors.white,
+                  child: Center(
+                    child: Image.asset(
+                      'assets/sprites/eggs/5.png',
+                      width: 96,
+                      height: 96,
+                      fit: BoxFit.contain,
+                      filterQuality: FilterQuality.none,
+                      errorBuilder: (context, error, stack) {
+                        return const Icon(
+                          Icons.egg,
+                          size: 64,
+                          color: Colors.white,
+                        );
+                      },
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -89,17 +108,24 @@ class _SplashScreenState extends State<SplashScreen>
                   'FocusPal',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 36,
+                    fontSize: 38,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 2,
+                    shadows: [
+                      Shadow(
+                        color: Color(0x66FFB300),
+                        blurRadius: 18,
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Your focus companion',
+                  'A bond worth putting the phone down for.',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.7),
-                    fontSize: 16,
+                    fontSize: 14,
+                    fontStyle: FontStyle.italic,
                   ),
                 ),
               ],

@@ -199,15 +199,14 @@ class _FocusTimerScreenState extends State<FocusTimerScreen> {
     final species = chibiState.chibi?.species;
     final progress = focusState.progress;
 
-    // Progress ring colour: blue -> gold -> green
-    Color progressColor;
-    if (progress < 0.5) {
-      progressColor =
-          Color.lerp(Colors.lightBlue, Colors.amber, progress * 2)!;
-    } else {
-      progressColor =
-          Color.lerp(Colors.amber, Colors.green, (progress - 0.5) * 2)!;
-    }
+    // Progress ring colour: warm amber/gold spectrum throughout the
+    // session (matches FocusPal brand palette). Starts as a softer
+    // amber, deepens toward gold as completion approaches.
+    final progressColor = Color.lerp(
+      const Color(0xFFFFD180), // soft amber
+      const Color(0xFFFFB300), // gold
+      progress,
+    )!;
 
     return Stack(
       fit: StackFit.expand,
@@ -219,16 +218,25 @@ class _FocusTimerScreenState extends State<FocusTimerScreen> {
           child: Column(
             children: [
               const SizedBox(height: 24),
+              // Active-session banner: lighter weight + a warm amber drop
+              // shadow over the existing readability shadow, so the line
+              // reads as celebratory rather than dialog-style bold.
               Text(
                 '${chibiState.chibi?.name ?? "Chibi"} is exploring!',
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.4,
                   shadows: [
                     Shadow(
-                      color: Colors.black54,
-                      blurRadius: 4,
+                      color: Color(0xCC000000),
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
+                    ),
+                    Shadow(
+                      color: Color(0x66FFB300),
+                      blurRadius: 14,
                     ),
                   ],
                 ),
