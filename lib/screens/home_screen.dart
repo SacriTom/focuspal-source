@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/mood.dart';
 import '../state/chibi_state.dart';
 import '../state/environment_state.dart';
 import '../state/settings_state.dart';
@@ -163,6 +164,60 @@ class _NavItem extends StatelessWidget {
   }
 }
 
+/// Distinct rooms surfaced on the Home tab.
+/// A1 pass: name + emoji at top, Chibi position shifts horizontally so the
+/// space reads as bedroom / kitchen / living room rather than one cluttered
+/// scene. Future passes (A2, A3) will replace the label with real wall art.
+enum _HomeRoom {
+  bedroom,
+  kitchen,
+  livingRoom;
+
+  String get label {
+    switch (this) {
+      case _HomeRoom.bedroom:
+        return 'Bedroom';
+      case _HomeRoom.kitchen:
+        return 'Kitchen';
+      case _HomeRoom.livingRoom:
+        return 'Living Room';
+    }
+  }
+
+  /// 1-glyph emoji that prints alongside the room label.
+  String get emoji {
+    switch (this) {
+      case _HomeRoom.bedroom:
+        return '\u{1F6CF}️'; // 🛏
+      case _HomeRoom.kitchen:
+        return '\u{1F373}'; // 🍳
+      case _HomeRoom.livingRoom:
+        return '\u{1F6CB}️'; // 🛋
+    }
+  }
+
+  /// Horizontal anchor for the Chibi as a fraction of screen width.
+  /// 0.5 = centre. Bedroom leans right (sleep area), kitchen leans left,
+  /// living room is centre.
+  double get chibiAnchorFraction {
+    switch (this) {
+      case _HomeRoom.bedroom:
+        return 0.72;
+      case _HomeRoom.kitchen:
+        return 0.28;
+      case _HomeRoom.livingRoom:
+        return 0.50;
+    }
+  }
+}
+
+_HomeRoom _roomFor(ChibiState s) {
+  if (s.mood == MoodState.sleepy) return _HomeRoom.bedroom;
+  // Cooking emoji 🍳 -> Kitchen.
+  if (s.speechEmoji == '\u{1F373}') return _HomeRoom.kitchen;
+  return _HomeRoom.livingRoom;
+}
+
 /// The actual home tab content with environment scene and Chibi.
 class _HomeTab extends StatelessWidget {
   const _HomeTab();
@@ -171,6 +226,8 @@ class _HomeTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final chibiState = context.watch<ChibiState>();
     final species = chibiState.chibi?.species;
+    final room = _roomFor(chibiState);
+    final screenW = MediaQuery.of(context).size.width;
 
     return Stack(
       fit: StackFit.expand,
@@ -188,43 +245,59 @@ class _HomeTab extends StatelessWidget {
           ),
         ),
 
-        // Home icon (top-left)
+        // Room badge (top-left). Replaces the static 'Home' chip and gives
+        // the user the spatial cue of which room their Chibi is in.
         Positioned(
           top: MediaQuery.of(context).padding.top + 12,
           left: 16,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.home, color: Colors.white70, size: 18),
-                SizedBox(width: 4),
-                Text(
-                  'Home',
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 350),
+            child: Container(
+              key: ValueKey(room),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.35),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.12),
                 ),
-              ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    room.emoji,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    room.label,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
 
-        // Chibi + speech bubble (centre-bottom area)
+        // Chibi + speech bubble. Position glides horizontally to the room
+        // anchor so the Chibi appears to walk between rooms.
         if (species != null)
-          Positioned(
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 600),
+            curve: Curves.easeInOut,
             bottom: 80,
-            left: 0,
-            right: 0,
+            left: (screenW * room.chibiAnchorFraction) - 90,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Speech bubble
                 SpeechBubble(emoji: chibiState.speechEmoji),
                 const SizedBox(height: 8),
-                // Chibi - tappable
                 GestureDetector(
                   onTap: () => chibiState.startInteraction(),
                   child: ChibiSpriteWidget(

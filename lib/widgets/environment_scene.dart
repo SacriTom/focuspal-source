@@ -1,7 +1,8 @@
-// Full-screen environment background with time-of-day tinting
-// and wellbeing brightness/saturation adjustments.
-// Uses the home environment sprites (Interior.png / exterior.png)
-// or adventure forest backgrounds.
+// Full-screen environment background.
+// Adventure mode: forest PNG.
+// Home mode (A1): cozy time-of-day gradient instead of the previous
+// Interior.png. The latter is a furniture sprite-atlas, not a composed
+// room scene; stretching it as a background read as visual clutter.
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,36 +21,85 @@ class EnvironmentScene extends StatelessWidget {
   Widget build(BuildContext context) {
     final env = context.watch<EnvironmentState>();
 
-    final String bgAsset = isAdventure
-        ? 'assets/environments/adventure/Cartoon_Forest_BG_01.png'
-        : 'assets/environments/home/Interior.png';
+    if (isAdventure) {
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          ColorFiltered(
+            colorFilter: ColorFilter.matrix(_brightnessMatrix(
+              env.wellbeingBrightness,
+              env.wellbeingSaturation,
+            )),
+            child: Image.asset(
+              'assets/environments/adventure/Cartoon_Forest_BG_01.png',
+              fit: BoxFit.cover,
+              filterQuality: FilterQuality.none,
+              errorBuilder: (context, error, stack) {
+                return Container(color: _fallbackColor(env.timeOfDay));
+              },
+            ),
+          ),
+          Container(color: Color(env.timeOfDayTint)),
+        ],
+      );
+    }
 
+    // Home: cozy gradient that shifts with time-of-day. No sprite atlas.
+    final palette = _homePalette(env.timeOfDay);
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Background image
-        ColorFiltered(
-          colorFilter: ColorFilter.matrix(_brightnessMatrix(
-            env.wellbeingBrightness,
-            env.wellbeingSaturation,
-          )),
-          child: Image.asset(
-            bgAsset,
-            fit: BoxFit.cover,
-            filterQuality: FilterQuality.none, // Pixel art
-            errorBuilder: (context, error, stack) {
-              return Container(
-                color: _fallbackColor(env.timeOfDay),
-              );
-            },
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: palette,
+            ),
           ),
         ),
-        // Time-of-day tint overlay
-        Container(
-          color: Color(env.timeOfDayTint),
+        // Soft warm horizon stripe so the lower half reads as a floor area
+        // rather than empty space  helps the Chibi feel grounded.
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: FractionallySizedBox(
+            widthFactor: 1.0,
+            heightFactor: 0.3,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    palette.last.withValues(alpha: 0.0),
+                    palette.last.withValues(alpha: 0.55),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
+        Container(color: Color(env.timeOfDayTint)),
       ],
     );
+  }
+
+  /// Two-stop gradient per time-of-day, cozy / warm rather than busy.
+  List<Color> _homePalette(ChibiDayPhase phase) {
+    switch (phase) {
+      case ChibiDayPhase.dawn:
+        return const [Color(0xFF3E3160), Color(0xFFFFB689)];
+      case ChibiDayPhase.morning:
+        return const [Color(0xFF4A6FA5), Color(0xFFFFE4B5)];
+      case ChibiDayPhase.afternoon:
+        return const [Color(0xFF5B7CAA), Color(0xFFFFEEC9)];
+      case ChibiDayPhase.evening:
+        return const [Color(0xFF3D5A80), Color(0xFFEE9B5C)];
+      case ChibiDayPhase.dusk:
+        return const [Color(0xFF2C3E66), Color(0xFFAB6BB5)];
+      case ChibiDayPhase.night:
+        return const [Color(0xFF0F1A35), Color(0xFF2E3F66)];
+    }
   }
 
   /// Builds a colour matrix that adjusts brightness and saturation.
