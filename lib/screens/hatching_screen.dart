@@ -1,6 +1,9 @@
 // Hatching screen: Hold finger on egg to warm it.
-// Max 60 seconds (D-035). Warmth meter fills while holding,
-// drains slowly when released. Egg wobbles, cracks, Chibi emerges.
+// Max 30 seconds (D-035 revised post-CP-016 polish — was 60s; halved
+// after user-feel testing showed the bonding ceremony stays just as
+// intentional at 30s and onboarding feels more responsive in the demo
+// video). Warmth meter fills while holding, drains slowly when released.
+// Egg wobbles, cracks, Chibi emerges.
 
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -25,8 +28,9 @@ class _HatchingScreenState extends State<HatchingScreen> {
   bool _showInstruction = true;
   Timer? _warmthTimer;
 
-  // Max 60 seconds = warmth fills at ~1.67% per second
-  static const double _warmthPerTick = 0.0167;
+  // Max 30 seconds = warmth fills at ~3.33% per second.
+  // Halved from 60s in the post-CP-016 polish pass (D-035 revision).
+  static const double _warmthPerTick = 0.0333;
   // Drain rate when not holding: ~1% per second
   static const double _drainPerTick = 0.01;
   static const _tickInterval = Duration(milliseconds: 100);
@@ -94,33 +98,40 @@ class _HatchingScreenState extends State<HatchingScreen> {
       backgroundColor: const Color(0xFF1A237E),
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Spacer(flex: 2),
-            // Egg / hatched Chibi
-            GestureDetector(
-              onTapDown: (_) => _startHolding(),
-              onTapUp: (_) => _stopHolding(),
-              onTapCancel: _stopHolding,
-              onLongPressStart: (_) => _startHolding(),
-              onLongPressEnd: (_) => _stopHolding(),
-              child: EggAnimation(
-                species: widget.species,
-                warmth: _warmth,
-                hatched: _hatched,
-                isHolding: _isHolding,
+            // Egg / hatched Chibi  explicit Center wrapper so the visual
+            // egg always sits on the screen midline regardless of asset
+            // padding inside the source PNG.
+            Center(
+              child: GestureDetector(
+                onTapDown: (_) => _startHolding(),
+                onTapUp: (_) => _stopHolding(),
+                onTapCancel: _stopHolding,
+                onLongPressStart: (_) => _startHolding(),
+                onLongPressEnd: (_) => _stopHolding(),
+                child: EggAnimation(
+                  species: widget.species,
+                  warmth: _warmth,
+                  hatched: _hatched,
+                  isHolding: _isHolding,
+                ),
               ),
             ),
             const SizedBox(height: 32),
-            // Warmth meter
+            // Warmth meter  explicit Center wrapper for the same reason.
             if (!_hatched)
-              WarmthMeter(progress: _warmth),
+              Center(child: WarmthMeter(progress: _warmth)),
             if (_hatched)
-              const Text(
-                'Welcome to the world!',
-                style: TextStyle(
-                  color: Colors.amber,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+              const Center(
+                child: Text(
+                  'Welcome to the world!',
+                  style: TextStyle(
+                    color: Colors.amber,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             const Spacer(),
