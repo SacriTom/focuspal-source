@@ -1,0 +1,62 @@
+name: focuspal
+description: "FocusPal - A Tamagotchi-style screen-time companion"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  provider: ^6.1.2
+  shared_preferences: ^2.3.4
+  sqflite: ^2.4.1
+  path: ^1.9.1
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    # Cat sprites
+    - assets/sprites/cat/Idle/
+    - assets/sprites/cat/Walk/
+    - assets/sprites/cat/Jump/
+    - assets/sprites/cat/Roll/
+    - assets/sprites/cat/Fly/
+    - assets/sprites/cat/Hit/
+    - assets/sprites/cat/Stuned/
+    - assets/sprites/cat/Throwing/
+    - assets/sprites/cat/Dead/
+    # Penguin sprites
+    - assets/sprites/penguin/Idle/
+    - assets/sprites/penguin/Walk/
+    - assets/sprites/penguin/Jump/
+    - assets/sprites/penguin/Roll/
+    - assets/sprites/penguin/Fly/
+    - assets/sprites/penguin/Hit/
+    - assets/sprites/penguin/Confused/
+    - assets/sprites/penguin/Throwing/
+    - assets/sprites/penguin/Dead/
+    # Panda sprites
+    - assets/sprites/panda/Idle/
+    - assets/sprites/panda/Walk/
+    - assets/sprites/panda/Jump/
+    - assets/sprites/panda/Roll/
+    - assets/sprites/panda/Fly/
+    - assets/sprites/panda/Hit/
+    - assets/sprites/panda/Stuned/
+    - assets/sprites/panda/Throwing/
+    - assets/sprites/panda/Dead/
+    # Eggs
+    - assets/sprites/eggs/
+    # Environments
+    - assets/environments/home/
+    - assets/environments/adventure/
