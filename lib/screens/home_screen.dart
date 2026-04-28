@@ -9,7 +9,6 @@ import '../state/chibi_state.dart';
 import '../state/environment_state.dart';
 import '../state/settings_state.dart';
 import '../widgets/chibi_sprite.dart';
-import '../widgets/environment_scene.dart';
 import '../widgets/mood_indicator.dart';
 import '../widgets/speech_bubble.dart';
 import 'focus_timer_screen.dart';
@@ -165,9 +164,9 @@ class _NavItem extends StatelessWidget {
 }
 
 /// Distinct rooms surfaced on the Home tab.
-/// A1 pass: name + emoji at top, Chibi position shifts horizontally so the
-/// space reads as bedroom / kitchen / living room rather than one cluttered
-/// scene. Future passes (A2, A3) will replace the label with real wall art.
+/// A2 pass: rooms are visibly composed (wall + floor + furniture geometry)
+/// in three side-by-side zones. Layout order on screen, left-to-right, is
+/// kitchen | living room | bedroom (matches chibiAnchorFraction).
 enum _HomeRoom {
   bedroom,
   kitchen,
@@ -202,12 +201,360 @@ enum _HomeRoom {
   double get chibiAnchorFraction {
     switch (this) {
       case _HomeRoom.bedroom:
-        return 0.72;
+        return 0.83;
       case _HomeRoom.kitchen:
-        return 0.28;
+        return 0.17;
       case _HomeRoom.livingRoom:
         return 0.50;
     }
+  }
+
+  /// Wall colour when the room is the active zone. Soft warm tones.
+  Color get wallActive {
+    switch (this) {
+      case _HomeRoom.bedroom:
+        return const Color(0xFF3F4A78); // dusk blue
+      case _HomeRoom.kitchen:
+        return const Color(0xFF6B5840); // warm tan
+      case _HomeRoom.livingRoom:
+        return const Color(0xFF52456E); // muted plum
+    }
+  }
+
+  /// Wall colour when not active  ~25% darker so the active zone reads.
+  Color get wallDim {
+    switch (this) {
+      case _HomeRoom.bedroom:
+        return const Color(0xFF2C355A);
+      case _HomeRoom.kitchen:
+        return const Color(0xFF4A3D2C);
+      case _HomeRoom.livingRoom:
+        return const Color(0xFF3A3151);
+    }
+  }
+
+  Color get floorActive {
+    switch (this) {
+      case _HomeRoom.bedroom:
+        return const Color(0xFF6B5A3E); // warm wood
+      case _HomeRoom.kitchen:
+        return const Color(0xFF847565); // tile
+      case _HomeRoom.livingRoom:
+        return const Color(0xFF5C4D3D); // dark wood
+    }
+  }
+
+  Color get floorDim {
+    switch (this) {
+      case _HomeRoom.bedroom:
+        return const Color(0xFF463C2A);
+      case _HomeRoom.kitchen:
+        return const Color(0xFF564D43);
+      case _HomeRoom.livingRoom:
+        return const Color(0xFF3D332A);
+    }
+  }
+}
+
+/// Three rooms rendered side by side with wall + floor + simple furniture
+/// geometry. Visual style is intentionally graphic / non-pixel so it does
+/// not fight the pixel-art Chibi sprite for visual attention.
+class _RoomsScene extends StatelessWidget {
+  final _HomeRoom activeRoom;
+  const _RoomsScene({required this.activeRoom});
+
+  @override
+  Widget build(BuildContext context) {
+    // Display order, left-to-right
+    const order = [_HomeRoom.kitchen, _HomeRoom.livingRoom, _HomeRoom.bedroom];
+    return Row(
+      children: [
+        for (int i = 0; i < order.length; i++)
+          Expanded(
+            child: _RoomColumn(
+              room: order[i],
+              isActive: order[i] == activeRoom,
+              showRightDivider: i < order.length - 1,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _RoomColumn extends StatelessWidget {
+  final _HomeRoom room;
+  final bool isActive;
+  final bool showRightDivider;
+  const _RoomColumn({
+    required this.room,
+    required this.isActive,
+    required this.showRightDivider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final wall = isActive ? room.wallActive : room.wallDim;
+    final floor = isActive ? room.floorActive : room.floorDim;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 350),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Wall + floor split
+          Column(
+            children: [
+              Expanded(
+                flex: 7,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 350),
+                  color: wall,
+                ),
+              ),
+              Expanded(
+                flex: 3,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 350),
+                  color: floor,
+                ),
+              ),
+            ],
+          ),
+          // Skirting board line where wall meets floor
+          FractionallySizedBox(
+            alignment: Alignment.bottomCenter,
+            heightFactor: 0.3,
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                height: 2,
+                color: Colors.black.withValues(alpha: 0.25),
+              ),
+            ),
+          ),
+          // Furniture, anchored on the floor
+          Align(
+            alignment: const Alignment(0.0, 0.55),
+            child: _RoomFurniture(room: room, isActive: isActive),
+          ),
+          // Right wall-divider line
+          if (showRightDivider)
+            Positioned(
+              right: 0,
+              top: 0,
+              bottom: 0,
+              child: Container(
+                width: 2,
+                color: Colors.black.withValues(alpha: 0.30),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RoomFurniture extends StatelessWidget {
+  final _HomeRoom room;
+  final bool isActive;
+  const _RoomFurniture({required this.room, required this.isActive});
+
+  @override
+  Widget build(BuildContext context) {
+    final dim = isActive ? 1.0 : 0.55;
+    switch (room) {
+      case _HomeRoom.bedroom:
+        return Opacity(opacity: dim, child: const _BedShape());
+      case _HomeRoom.kitchen:
+        return Opacity(opacity: dim, child: const _KitchenCounterShape());
+      case _HomeRoom.livingRoom:
+        return Opacity(opacity: dim, child: const _SofaShape());
+    }
+  }
+}
+
+class _BedShape extends StatelessWidget {
+  const _BedShape();
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 90,
+      height: 50,
+      child: Stack(
+        children: [
+          // Mattress + frame
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              height: 28,
+              decoration: BoxDecoration(
+                color: const Color(0xFFDDE3F0),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: Colors.black26),
+              ),
+            ),
+          ),
+          // Pillow
+          Positioned(
+            left: 6,
+            top: 14,
+            child: Container(
+              width: 22,
+              height: 18,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.85),
+                borderRadius: BorderRadius.circular(3),
+                border: Border.all(color: Colors.black26),
+              ),
+            ),
+          ),
+          // Headboard
+          Positioned(
+            left: 0,
+            top: 0,
+            child: Container(
+              width: 6,
+              height: 38,
+              decoration: BoxDecoration(
+                color: const Color(0xFF8C5A3B),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _KitchenCounterShape extends StatelessWidget {
+  const _KitchenCounterShape();
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 90,
+      height: 50,
+      child: Stack(
+        children: [
+          // Counter
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              height: 26,
+              decoration: BoxDecoration(
+                color: const Color(0xFFD8B886),
+                border: Border.all(color: Colors.black38),
+                borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(2)),
+              ),
+            ),
+          ),
+          // Pot
+          Positioned(
+            left: 32,
+            bottom: 22,
+            child: Container(
+              width: 24,
+              height: 16,
+              decoration: BoxDecoration(
+                color: const Color(0xFF455A64),
+                borderRadius: BorderRadius.circular(3),
+                border: Border.all(color: Colors.black54),
+              ),
+            ),
+          ),
+          // Steam dot
+          Positioned(
+            left: 42,
+            bottom: 40,
+            child: Container(
+              width: 4,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.7),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SofaShape extends StatelessWidget {
+  const _SofaShape();
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 90,
+      height: 50,
+      child: Stack(
+        children: [
+          // Seat
+          Positioned(
+            left: 6,
+            right: 6,
+            bottom: 0,
+            child: Container(
+              height: 22,
+              decoration: BoxDecoration(
+                color: const Color(0xFF6FA5C9),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: Colors.black26),
+              ),
+            ),
+          ),
+          // Backrest
+          Positioned(
+            left: 6,
+            right: 6,
+            top: 4,
+            child: Container(
+              height: 24,
+              decoration: BoxDecoration(
+                color: const Color(0xFF89C3E5),
+                borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(8)),
+                border: Border.all(color: Colors.black26),
+              ),
+            ),
+          ),
+          // Left arm
+          Positioned(
+            left: 0,
+            top: 6,
+            child: Container(
+              width: 8,
+              height: 26,
+              decoration: BoxDecoration(
+                color: const Color(0xFF5A8FB0),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: Colors.black26),
+              ),
+            ),
+          ),
+          // Right arm
+          Positioned(
+            right: 0,
+            top: 6,
+            child: Container(
+              width: 8,
+              height: 26,
+              decoration: BoxDecoration(
+                color: const Color(0xFF5A8FB0),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: Colors.black26),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -232,8 +579,9 @@ class _HomeTab extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Full-screen environment background
-        const EnvironmentScene(),
+        // A2: three-room composed scene with wall + floor + furniture
+        // geometry. Replaces the simple gradient from A1.
+        _RoomsScene(activeRoom: room),
 
         // Mood indicator (top-right)
         Positioned(
