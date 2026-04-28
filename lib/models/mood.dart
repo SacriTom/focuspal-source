@@ -1,5 +1,5 @@
-/// The six mood states from the design spec, ordered most-positive
-/// to most-negative, plus the special Sleepy state.
+// The six mood states from the design spec, ordered most-positive
+// to most-negative, plus the special Sleepy state.
 
 enum MoodState {
   ecstatic,

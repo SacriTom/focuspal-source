@@ -1,5 +1,5 @@
-/// Animated sprite renderer. Loads PNG frame sequences and plays them
-/// at the specified frame rate. Character-agnostic: just feed it paths.
+// Animated sprite renderer. Loads PNG frame sequences and plays them
+// at the specified frame rate. Character-agnostic: just feed it paths.
 
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -55,6 +55,17 @@ class _ChibiSpriteWidgetState extends State<ChibiSpriteWidget> {
     _currentFrame = 0;
 
     if (_animation.framePaths.isEmpty) return;
+
+    // Pre-decode every frame after first frame so rotating the sprite
+    // doesn't show a transient blank/last-good frame while the next PNG
+    // decodes (visible flicker on Naming-submit Jump animation, observed
+    // in smoke test 2026-04-21 section 4).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      for (final path in _animation.framePaths) {
+        precacheImage(AssetImage(path), context);
+      }
+    });
 
     final interval = Duration(
       milliseconds: (1000 / _animation.fps).round(),

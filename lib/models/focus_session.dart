@@ -1,4 +1,4 @@
-/// Represents a completed or in-progress focus session (adventure).
+// Represents a completed or in-progress focus session (adventure).
 
 class FocusSession {
   final String id;

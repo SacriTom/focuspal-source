@@ -1,6 +1,6 @@
-/// Hatching screen: Hold finger on egg to warm it.
-/// Max 60 seconds (D-035). Warmth meter fills while holding,
-/// drains slowly when released. Egg wobbles, cracks, Chibi emerges.
+// Hatching screen: Hold finger on egg to warm it.
+// Max 60 seconds (D-035). Warmth meter fills while holding,
+// drains slowly when released. Egg wobbles, cracks, Chibi emerges.
 
 import 'dart:async';
 import 'package:flutter/material.dart';

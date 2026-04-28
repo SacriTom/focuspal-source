@@ -1,6 +1,6 @@
-/// Egg widget for hatching screen. Wobbles with increasing intensity
-/// as warmth increases. Shows crack overlays at 50%, 65%, 80%.
-/// At 100%, egg splits and Chibi emerges with elasticOut animation.
+// Egg widget for hatching screen. Wobbles with increasing intensity
+// as warmth increases. Shows crack overlays at 50%, 65%, 80%.
+// At 100%, egg splits and Chibi emerges with elasticOut animation.
 
 import 'dart:math';
 import 'package:flutter/material.dart';

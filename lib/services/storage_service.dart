@@ -1,5 +1,5 @@
-/// Local persistence layer.
-/// SharedPreferences for settings, SQLite for Chibi state and history.
+// Local persistence layer.
+// SharedPreferences for settings, SQLite for Chibi state and history.
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:shared_preferences/shared_preferences.dart';

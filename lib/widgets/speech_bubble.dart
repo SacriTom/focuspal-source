@@ -1,5 +1,5 @@
-/// Floating emoji speech bubble that appears above the Chibi.
-/// Fades in, holds, fades out. Driven by ChibiState.speechEmoji.
+// Floating emoji speech bubble that appears above the Chibi.
+// Fades in, holds, fades out. Driven by ChibiState.speechEmoji.
 
 import 'package:flutter/material.dart';
 

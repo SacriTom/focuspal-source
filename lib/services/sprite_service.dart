@@ -1,6 +1,6 @@
-/// Character-agnostic sprite loading service.
-/// Adding a new species requires only a new sprite folder and enum value --
-/// zero changes to this file.
+// Character-agnostic sprite loading service.
+// Adding a new species requires only a new sprite folder and enum value --
+// zero changes to this file.
 
 import '../models/chibi.dart';
 
@@ -219,7 +219,7 @@ class SpriteService {
       // Roll uses single-digit naming (Roll_0, Roll_1, etc.)
       // Others use zero-padded (Idle_00, Idle_01, etc.)
       final frameNum = (folderName == 'Roll') ? '$i' : i.toString().padLeft(2, '0');
-      frames.add('$speciesPrefix/$folderName/${filePrefix}${animName}_$frameNum.png');
+      frames.add('$speciesPrefix/$folderName/$filePrefix${animName}_$frameNum.png');
     }
     return SpriteAnimation(framePaths: frames, fps: fps, loop: loop);
   }

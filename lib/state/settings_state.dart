@@ -1,7 +1,8 @@
-/// Manages sensitivity presets and user preferences.
-/// Implements D-025 (presets), D-036 (relaxed minimums), sleep schedule.
+// Manages sensitivity presets and user preferences.
+// Implements D-025 (presets), D-036 (relaxed minimums), sleep schedule.
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import '../services/storage_service.dart';
 
 /// Named presets from the design spec Section 5.3.
@@ -177,6 +178,32 @@ class SettingsState extends ChangeNotifier {
     _tier2Enabled = v;
     await StorageService.setTier2Enabled(v);
     notifyListeners();
+  }
+
+  // Platform channel for the Android Usage Access permission. The Kotlin
+  // side (MainActivity.kt) exposes isUsageAccessGranted which we call on
+  // every app resume to keep the in-app toggle honest about real OS state
+  // (prevents the CP-011-class regression where the toggle reads "Active"
+  // while the OS has revoked or never granted the permission).
+  static const MethodChannel _usageStatsChannel =
+      MethodChannel('com.focuspal/usage_stats');
+
+  Future<void> reconcileTier2Permission() async {
+    if (!_tier2Enabled) return; // nothing to reconcile if user never opted in
+    try {
+      final granted = await _usageStatsChannel
+          .invokeMethod<bool>('isUsageAccessGranted');
+      if (granted == false && _tier2Enabled) {
+        _tier2Enabled = false;
+        await StorageService.setTier2Enabled(false);
+        notifyListeners();
+      }
+    } on PlatformException catch (e) {
+      debugPrint('Tier 2 reconcile failed: ${e.message}');
+    } on MissingPluginException {
+      // Platform channel not registered (e.g. iOS Phase 1 stub or web build).
+      // Leave state untouched.
+    }
   }
 
   /// Check if we are currently in the sleep window.

@@ -1,7 +1,7 @@
-/// Focus timer screen: passive mode info + active mode.
-/// Duration selector (25/45/60/90 min pills), start button,
-/// adventure scene during active session, countdown timer,
-/// peek mechanic (D-024: no penalty for checking).
+// Focus timer screen: passive mode info + active mode.
+// Duration selector (25/45/60/90 min pills), start button,
+// adventure scene during active session, countdown timer,
+// peek mechanic (D-024: no penalty for checking).
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -64,6 +64,41 @@ class _FocusTimerScreenState extends State<FocusTimerScreen> {
                   fontSize: 15,
                 ),
                 textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              // Passive-baseline info strip (smoke test note 8).
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.1),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.timer_outlined,
+                      color: Colors.white.withValues(alpha: 0.5),
+                      size: 18,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Passive mode is always on — '
+                        '${chibiState.chibi?.name ?? "your Chibi"} '
+                        'reads your in-app focus signal even without a session.',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.6),
+                          fontSize: 12.5,
+                          height: 1.35,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const Spacer(),
               // Chibi with adventure gear

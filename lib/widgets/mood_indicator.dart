@@ -1,5 +1,5 @@
-/// Top-right mood emoji indicator with background glow.
-/// Shows current mood state with tappable tooltip.
+// Top-right mood emoji indicator with background glow.
+// Shows current mood state with tappable tooltip.
 
 import 'package:flutter/material.dart';
 import '../models/mood.dart';

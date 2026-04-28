@@ -1,5 +1,5 @@
-/// Manages active and passive focus sessions.
-/// Implements design spec Sections 6 and 10.
+// Manages active and passive focus sessions.
+// Implements design spec Sections 6 and 10.
 
 import 'dart:async';
 import 'package:flutter/foundation.dart';

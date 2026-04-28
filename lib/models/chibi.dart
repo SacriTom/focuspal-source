@@ -1,6 +1,6 @@
-/// Data models for the Chibi creature and related entities.
-/// Designed to be character-agnostic: adding a new species requires
-/// only a new entry in [ChibiSpecies] and a sprite folder.
+// Data models for the Chibi creature and related entities.
+// Designed to be character-agnostic: adding a new species requires
+// only a new entry in [ChibiSpecies] and a sprite folder.
 
 enum ChibiSpecies {
   cat,
@@ -21,7 +21,7 @@ enum ChibiSpecies {
   /// Path prefix for sprite assets. Each species folder follows the
   /// same internal structure (Idle/, Walk/, Jump/, etc.) so the
   /// animation system never needs to know which species it is rendering.
-  String get spritePrefix => 'assets/sprites/${name}';
+  String get spritePrefix => 'assets/sprites/$name';
 
   /// Egg image used on the Choose Chibi and Hatching screens.
   /// Egg 1 (pink/warm) = Cat, Egg 3 (cyan/cool) = Penguin,

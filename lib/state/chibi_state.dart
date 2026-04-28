@@ -1,5 +1,5 @@
-/// Manages the Chibi's mood, current animation, and lifecycle.
-/// Implements the emotion state machine from design spec Section 5.
+// Manages the Chibi's mood, current animation, and lifecycle.
+// Implements the emotion state machine from design spec Section 5.
 
 import 'dart:async';
 import 'package:flutter/foundation.dart';
@@ -225,20 +225,31 @@ class ChibiState extends ChangeNotifier {
   /// Speech bubbles appear every 15-30 seconds during idle viewing.
   void _startSpeechBubbleTimer() {
     _speechBubbleTimer?.cancel();
-    _speechBubbleTimer =
-        Timer.periodic(const Duration(seconds: 20), (_) {
-      if (_isInteracting) return;
-      final emojis = _mood.speechEmojis;
-      if (emojis.isEmpty) return;
-      _speechEmoji =
-          emojis[DateTime.now().millisecondsSinceEpoch % emojis.length];
-      notifyListeners();
+    // Show an initial bubble shortly after Home loads / app resumes so the
+    // user sees the Chibi has personality immediately, instead of waiting
+    // a full 20s for the periodic timer's first tick (smoke-test note 7).
+    Future.delayed(const Duration(seconds: 2), () {
+      if (_speechBubbleTimer == null || _isInteracting) return;
+      _emitSpeechBubble();
+    });
+    _speechBubbleTimer = Timer.periodic(
+      const Duration(seconds: 20),
+      (_) {
+        if (_isInteracting) return;
+        _emitSpeechBubble();
+      },
+    );
+  }
 
-      // Clear after 4 seconds
-      Future.delayed(const Duration(seconds: 4), () {
-        _speechEmoji = null;
-        notifyListeners();
-      });
+  void _emitSpeechBubble() {
+    final emojis = _mood.speechEmojis;
+    if (emojis.isEmpty) return;
+    _speechEmoji =
+        emojis[DateTime.now().millisecondsSinceEpoch % emojis.length];
+    notifyListeners();
+    Future.delayed(const Duration(seconds: 4), () {
+      _speechEmoji = null;
+      notifyListeners();
     });
   }
 

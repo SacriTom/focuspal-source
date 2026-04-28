@@ -1,6 +1,6 @@
-/// Naming screen: Chibi displayed with curious Idle animation.
-/// Text input "What would you like to call me?"
-/// On submit, Chibi does Jump celebration.
+// Naming screen: Chibi displayed with curious Idle animation.
+// Text input "What would you like to call me?"
+// On submit, Chibi does Jump celebration.
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

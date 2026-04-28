@@ -1,7 +1,7 @@
-/// Tier 2 permission nudge screen.
-/// Chibi delivers permission request. Explains what, how, and why.
-/// "Enable" opens UsageStats settings. "Skip for now" proceeds to home.
-/// Non-punishing (D-031).
+// Tier 2 permission nudge screen.
+// Chibi delivers permission request. Explains what, how, and why.
+// "Enable" opens UsageStats settings. "Skip for now" proceeds to home.
+// Non-punishing (D-031).
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,11 +28,11 @@ class Tier2NudgeScreen extends StatelessWidget {
     }
 
     // For Phase 1, simulate enabling
-    if (context.mounted) {
-      final settings = context.read<SettingsState>();
-      await settings.setTier2Enabled(true);
-      _proceed(context);
-    }
+    if (!context.mounted) return;
+    final settings = context.read<SettingsState>();
+    await settings.setTier2Enabled(true);
+    if (!context.mounted) return;
+    _proceed(context);
   }
 
   void _skip(BuildContext context) {

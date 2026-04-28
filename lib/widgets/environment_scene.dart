@@ -1,7 +1,7 @@
-/// Full-screen environment background with time-of-day tinting
-/// and wellbeing brightness/saturation adjustments.
-/// Uses the home environment sprites (Interior.png / exterior.png)
-/// or adventure forest backgrounds.
+// Full-screen environment background with time-of-day tinting
+// and wellbeing brightness/saturation adjustments.
+// Uses the home environment sprites (Interior.png / exterior.png)
+// or adventure forest backgrounds.
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

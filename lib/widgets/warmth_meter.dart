@@ -1,6 +1,6 @@
-/// Hold-to-warm progress bar for the incubation / hatching screen.
-/// Fills while user holds finger on egg. Max 60 seconds (D-035).
-/// Drains slowly when released (~1% per second).
+// Hold-to-warm progress bar for the incubation / hatching screen.
+// Fills while user holds finger on egg. Max 60 seconds (D-035).
+// Drains slowly when released (~1% per second).
 
 import 'package:flutter/material.dart';
 

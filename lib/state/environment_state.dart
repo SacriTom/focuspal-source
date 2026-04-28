@@ -1,6 +1,6 @@
-/// Manages the visual environment state.
-/// Implements design spec Section 6 (environment states) and
-/// Section 4.1 (time-of-day awareness).
+// Manages the visual environment state.
+// Implements design spec Section 6 (environment states) and
+// Section 4.1 (time-of-day awareness).
 
 import 'package:flutter/foundation.dart';
 import '../models/mood.dart';

@@ -1,5 +1,5 @@
-/// Splash screen: logo + gentle pulse animation.
-/// Auto-navigates to ChooseChibi (new user) or Home (returning user).
+// Splash screen: logo + gentle pulse animation.
+// Auto-navigates to ChooseChibi (new user) or Home (returning user).
 
 import 'package:flutter/material.dart';
 import '../services/storage_service.dart';

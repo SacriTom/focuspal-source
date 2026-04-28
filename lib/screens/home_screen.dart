@@ -1,11 +1,12 @@
-/// Home screen: full-screen environment background, Chibi with
-/// mood-based animation, emoji speech bubbles, mood indicator,
-/// bottom navigation bar.
+// Home screen: full-screen environment background, Chibi with
+// mood-based animation, emoji speech bubbles, mood indicator,
+// bottom navigation bar.
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../state/chibi_state.dart';
 import '../state/environment_state.dart';
+import '../state/settings_state.dart';
 import '../widgets/chibi_sprite.dart';
 import '../widgets/environment_scene.dart';
 import '../widgets/mood_indicator.dart';
@@ -51,6 +52,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       chibiState.onAppResumed();
       context.read<EnvironmentState>().updateDayPhase();
+      // CP-011 follow-up: reconcile in-app Tier 2 toggle with the actual
+      // Android Usage Access permission state on every resume.
+      context.read<SettingsState>().reconcileTier2Permission();
     } else if (state == AppLifecycleState.paused) {
       chibiState.onAppPaused();
     }

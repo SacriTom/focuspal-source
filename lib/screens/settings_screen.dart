@@ -1,5 +1,5 @@
-/// Settings screen: Preset switcher, individual sensitivity sliders,
-/// sleep time picker, Tier 2 toggle, about section.
+// Settings screen: Preset switcher, individual sensitivity sliders,
+// sleep time picker, Tier 2 toggle, about section.
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -482,7 +482,7 @@ class _Tier2Toggle extends StatelessWidget {
               Switch(
                 value: enabled,
                 onChanged: onToggle,
-                activeColor: Colors.amber,
+                activeThumbColor: Colors.amber,
               ),
             ],
           ),

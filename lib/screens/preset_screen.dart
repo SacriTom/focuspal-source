@@ -1,6 +1,6 @@
-/// Preset selection screen: 3 cards (Relaxed / Focus-Friendly / Super-Focused).
-/// Each shows sensitivity description. Tap to select.
-/// D-036: Hard-coded minimums on Relaxed.
+// Preset selection screen: 3 cards (Relaxed / Focus-Friendly / Super-Focused).
+// Each shows sensitivity description. Tap to select.
+// D-036: Hard-coded minimums on Relaxed.
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

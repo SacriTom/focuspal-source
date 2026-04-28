@@ -1,6 +1,6 @@
-/// FocusPal — A Tamagotchi-style screen-time companion.
-/// Entry point: initialises storage, sets up Provider state,
-/// and routes to SplashScreen.
+// FocusPal — A Tamagotchi-style screen-time companion.
+// Entry point: initialises storage, sets up Provider state,
+// and routes to SplashScreen.
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

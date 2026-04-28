@@ -1,6 +1,6 @@
-/// Choose Chibi screen: 3 eggs (Cat/Penguin/Panda).
-/// Eggs wobble in idle. Selected egg wobbles more vigorously.
-/// Confirmation bottom sheet before proceeding to hatching.
+// Choose Chibi screen: 3 eggs (Cat/Penguin/Panda).
+// Eggs wobble in idle. Selected egg wobbles more vigorously.
+// Confirmation bottom sheet before proceeding to hatching.
 
 import 'dart:math';
 import 'package:flutter/material.dart';

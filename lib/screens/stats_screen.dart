@@ -1,5 +1,5 @@
-/// Stats screen: Focus history (sessions today/week), current streak,
-/// mood timeline. Tier 2 locked features banner if not enabled.
+// Stats screen: Focus history (sessions today/week), current streak,
+// mood timeline. Tier 2 locked features banner if not enabled.
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
