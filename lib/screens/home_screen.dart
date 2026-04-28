@@ -301,18 +301,20 @@ class _RoomColumn extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // Wall + floor split
+          // Wall + floor split. 6:4 (zoom-in pass) — was 7:3 — gives the
+          // floor more vertical real estate so less empty wall sits above
+          // the Chibi.
           Column(
             children: [
               Expanded(
-                flex: 7,
+                flex: 6,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 350),
                   color: wall,
                 ),
               ),
               Expanded(
-                flex: 3,
+                flex: 4,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 350),
                   color: floor,
@@ -320,10 +322,10 @@ class _RoomColumn extends StatelessWidget {
               ),
             ],
           ),
-          // Skirting board line where wall meets floor
+          // Skirting board line where wall meets floor (matches new 6:4 split)
           FractionallySizedBox(
             alignment: Alignment.bottomCenter,
-            heightFactor: 0.3,
+            heightFactor: 0.4,
             child: Align(
               alignment: Alignment.topCenter,
               child: Container(
@@ -332,19 +334,21 @@ class _RoomColumn extends StatelessWidget {
               ),
             ),
           ),
-          // Wall decoration (high on the wall, room-specific).
+          // Wall decoration (room-specific). Lowered from -0.55 to -0.25
+          // in the zoom-in pass so the gap between window/clock/picture
+          // and the Chibi reads as a closer camera, not an empty wall.
           Align(
-            alignment: const Alignment(0.0, -0.55),
+            alignment: const Alignment(0.0, -0.25),
             child: _WallDecoration(room: room, isActive: isActive),
           ),
           // Floor accessory (rug / coffee table / extra cabinet).
           Align(
-            alignment: const Alignment(0.0, 0.85),
+            alignment: const Alignment(0.0, 0.80),
             child: _FloorAccessory(room: room, isActive: isActive),
           ),
           // Main furniture, anchored on the floor.
           Align(
-            alignment: const Alignment(0.0, 0.55),
+            alignment: const Alignment(0.0, 0.45),
             child: _RoomFurniture(room: room, isActive: isActive),
           ),
           // Right wall-divider line
@@ -388,8 +392,8 @@ class _BedShape extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 90,
-      height: 50,
+      width: 110,
+      height: 60,
       child: Stack(
         children: [
           // Mattress + frame
@@ -444,8 +448,8 @@ class _KitchenCounterShape extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 90,
-      height: 50,
+      width: 110,
+      height: 60,
       child: Stack(
         children: [
           // Counter
@@ -544,8 +548,8 @@ class _BedroomWindow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 70,
-      height: 50,
+      width: 84,
+      height: 60,
       decoration: BoxDecoration(
         color: const Color(0xFF1B2742),
         border: Border.all(color: const Color(0xFF8C7A5C), width: 3),
@@ -591,8 +595,8 @@ class _KitchenClock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 32,
-      height: 32,
+      width: 40,
+      height: 40,
       decoration: BoxDecoration(
         color: const Color(0xFFF5E6C8),
         shape: BoxShape.circle,
@@ -646,41 +650,33 @@ class _LivingRoomPicture extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 56,
-      height: 40,
+      width: 70,
+      height: 50,
       decoration: BoxDecoration(
         color: const Color(0xFFF1D4A0),
         border: Border.all(color: const Color(0xFF7A4F2C), width: 3),
       ),
       child: Stack(
         children: [
-          // Sky
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            child: Container(
-              height: 18,
-              color: const Color(0xFF8FB6D9),
-            ),
-          ),
-          // Hills
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              height: 18,
-              color: const Color(0xFF7A9C5B),
-            ),
+          // Sky + hills as a 50/50 column so the picture fills cleanly at
+          // any frame size.
+          Column(
+            children: [
+              Expanded(
+                child: Container(color: const Color(0xFF8FB6D9)),
+              ),
+              Expanded(
+                child: Container(color: const Color(0xFF7A9C5B)),
+              ),
+            ],
           ),
           // Sun
           const Positioned(
-            top: 4,
-            right: 6,
+            top: 6,
+            right: 8,
             child: SizedBox(
-              width: 8,
-              height: 8,
+              width: 10,
+              height: 10,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: Color(0xFFFFCD52),
@@ -795,8 +791,8 @@ class _SofaShape extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 90,
-      height: 50,
+      width: 110,
+      height: 60,
       child: Stack(
         children: [
           // Seat
@@ -938,13 +934,14 @@ class _HomeTab extends StatelessWidget {
         ),
 
         // Chibi + speech bubble. Position glides horizontally to the room
-        // anchor so the Chibi appears to walk between rooms.
+        // anchor so the Chibi appears to walk between rooms. Width tuned
+        // to ~35% of typical screen widths in the zoom-in pass (was 180).
         if (species != null)
           AnimatedPositioned(
             duration: const Duration(milliseconds: 600),
             curve: Curves.easeInOut,
             bottom: 80,
-            left: (screenW * room.chibiAnchorFraction) - 90,
+            left: (screenW * room.chibiAnchorFraction) - 80,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -955,8 +952,8 @@ class _HomeTab extends StatelessWidget {
                   child: ChibiSpriteWidget(
                     species: species,
                     animationName: chibiState.currentAnimation,
-                    width: 180,
-                    height: 180,
+                    width: 160,
+                    height: 160,
                   ),
                 ),
               ],
