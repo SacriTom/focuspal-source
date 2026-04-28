@@ -134,22 +134,64 @@ class StorageService {
       await _prefs?.setInt('night_disturbances', v);
 
   // ──────────────────────── SQLite: Chibi ──────────────────────
+  //
+  // Web builds run with `_db == null` (kIsWeb guard in init()), so the
+  // SQLite calls below are no-ops on web. To keep the Chibi visible
+  // across web sessions we mirror the four primary fields (id, species,
+  // name, createdAt) in SharedPreferences — that backend IS available on
+  // web. Mobile platforms write to both; SQLite is the source of truth,
+  // SharedPreferences acts as a redundant cache used only when SQLite
+  // returns null.
+
+  static const _kChibiId = 'chibi_active_id';
+  static const _kChibiSpecies = 'chibi_active_species';
+  static const _kChibiName = 'chibi_active_name';
+  static const _kChibiCreatedAt = 'chibi_active_created_at';
 
   static Future<void> insertChibi(ChibiRecord chibi) async {
     await _db?.insert('chibi', chibi.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
+    if (chibi.isActive) {
+      await _prefs?.setString(_kChibiId, chibi.id);
+      await _prefs?.setString(_kChibiSpecies, chibi.species.name);
+      await _prefs?.setString(_kChibiName, chibi.name);
+      await _prefs?.setString(
+          _kChibiCreatedAt, chibi.createdAt.toIso8601String());
+    }
   }
 
   static Future<ChibiRecord?> getActiveChibi() async {
     final results = await _db?.query('chibi',
         where: 'is_active = ?', whereArgs: [1], limit: 1);
-    if (results == null || results.isEmpty) return null;
-    return ChibiRecord.fromMap(results.first);
+    if (results != null && results.isNotEmpty) {
+      return ChibiRecord.fromMap(results.first);
+    }
+    // Fallback for web (no SQLite) and any future platform where the DB
+    // backend is unavailable but SharedPreferences is.
+    final id = _prefs?.getString(_kChibiId);
+    final species = _prefs?.getString(_kChibiSpecies);
+    final name = _prefs?.getString(_kChibiName);
+    final createdAt = _prefs?.getString(_kChibiCreatedAt);
+    if (id == null || species == null || name == null || createdAt == null) {
+      return null;
+    }
+    return ChibiRecord(
+      id: id,
+      species: ChibiSpecies.values.firstWhere(
+        (s) => s.name == species,
+        orElse: () => ChibiSpecies.cat,
+      ),
+      name: name,
+      createdAt: DateTime.tryParse(createdAt) ?? DateTime.now(),
+    );
   }
 
   static Future<void> updateChibi(ChibiRecord chibi) async {
     await _db?.update('chibi', chibi.toMap(),
         where: 'id = ?', whereArgs: [chibi.id]);
+    if (chibi.isActive) {
+      await _prefs?.setString(_kChibiName, chibi.name);
+    }
   }
 
   // ──────────────────────── SQLite: Mood History ──────────────────

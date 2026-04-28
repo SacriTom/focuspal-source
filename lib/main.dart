@@ -2,6 +2,7 @@
 // Entry point: initialises storage, sets up Provider state,
 // and routes to SplashScreen.
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,13 @@ import 'state/focus_state.dart';
 import 'state/settings_state.dart';
 import 'state/environment_state.dart';
 import 'screens/splash_screen.dart';
+
+/// Phone aspect ratio used to constrain the app's render area on web.
+/// The whole UI was designed against ~411 × 870 dp (Pixel-class) — letting
+/// it stretch across a desktop browser window broke the Home backdrop's
+/// "ground line" alignment with the Chibi position. We frame the web build
+/// in an AspectRatio so it always reads as a mobile app preview.
+const double _phoneAspectRatio = 411 / 870;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,6 +68,21 @@ class FocusPalApp extends StatelessWidget {
           useMaterial3: true,
           fontFamily: 'Roboto',
         ),
+        builder: (context, child) {
+          if (!kIsWeb || child == null) return child ?? const SizedBox();
+          // Letterbox the app inside a phone-aspect rectangle on the web
+          // so a desktop browser sees a mobile-app preview frame, with
+          // the same internal layout the on-device build was tuned for.
+          return ColoredBox(
+            color: const Color(0xFF0D1535),
+            child: Center(
+              child: AspectRatio(
+                aspectRatio: _phoneAspectRatio,
+                child: ClipRect(child: child),
+              ),
+            ),
+          );
+        },
         home: const SplashScreen(),
       ),
     );
