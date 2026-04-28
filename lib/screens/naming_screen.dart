@@ -73,18 +73,37 @@ class _NamingScreenState extends State<NamingScreen> {
               const SizedBox(height: 24),
               // Celebration or naming prompt
               if (_celebrating) ...[
-                Text(
-                  _nameController.text.trim(),
-                  style: const TextStyle(
-                    color: Colors.amber,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+                // Scale entrance: name lifts up elastically as the Chibi
+                // reacts. Every frame precached in F so no flicker.
+                TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.4, end: 1.0),
+                  duration: const Duration(milliseconds: 600),
+                  curve: Curves.elasticOut,
+                  builder: (context, scale, child) {
+                    return Transform.scale(scale: scale, child: child);
+                  },
+                  child: Text(
+                    _nameController.text.trim(),
+                    style: const TextStyle(
+                      color: Colors.amber,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  '\u{2764}\uFE0F',
-                  style: TextStyle(fontSize: 32),
+                // Heart fades in just after the name lifts.
+                TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  duration: const Duration(milliseconds: 800),
+                  curve: Curves.easeOut,
+                  builder: (context, opacity, child) {
+                    return Opacity(opacity: opacity, child: child);
+                  },
+                  child: const Text(
+                    '\u{2764}\uFE0F',
+                    style: TextStyle(fontSize: 32),
+                  ),
                 ),
               ] else ...[
                 const Text(
