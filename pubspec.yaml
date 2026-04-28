@@ -59,4 +59,5 @@ flutter:
     - assets/sprites/eggs/
     # Environments
     - assets/environments/home/
+    - assets/environments/home/extracted/
     - assets/environments/adventure/

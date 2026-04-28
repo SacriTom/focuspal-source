@@ -101,13 +101,16 @@ class _FocusTimerScreenState extends State<FocusTimerScreen> {
                 ),
               ),
               const Spacer(),
-              // Chibi with adventure gear
+              // Chibi with adventure gear (pre-session). Sized larger to
+              // match the home-screen camera distance — was 160; the
+              // 200 here keeps room for the duration pills + START
+              // button below.
               if (species != null)
                 ChibiSpriteWidget(
                   species: species,
                   animationName: 'walking',
-                  width: 160,
-                  height: 160,
+                  width: 200,
+                  height: 200,
                 ),
               const SizedBox(height: 8),
               const Text(
@@ -242,13 +245,16 @@ class _FocusTimerScreenState extends State<FocusTimerScreen> {
                 ),
               ),
               const Spacer(),
-              // Walking Chibi
+              // Walking Chibi  same camera distance as home so the
+              // active session feels continuous with the home scene.
+              // 320 is the practical max with a 180 progress ring and
+              // pause/end buttons sharing the screen below.
               if (species != null)
                 ChibiSpriteWidget(
                   species: species,
                   animationName: 'adventuring',
-                  width: 120,
-                  height: 120,
+                  width: 320,
+                  height: 320,
                 ),
               const SizedBox(height: 24),
               // Progress ring with timer
@@ -353,8 +359,8 @@ class _FocusTimerScreenState extends State<FocusTimerScreen> {
                 ChibiSpriteWidget(
                   species: species,
                   animationName: 'celebrating',
-                  width: 180,
-                  height: 180,
+                  width: 320,
+                  height: 320,
                 ),
               const SizedBox(height: 16),
               // Treasure reward placeholder
