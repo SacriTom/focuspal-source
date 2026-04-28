@@ -14,12 +14,19 @@ import 'state/settings_state.dart';
 import 'state/environment_state.dart';
 import 'screens/splash_screen.dart';
 
-/// Phone aspect ratio used to constrain the app's render area on web.
-/// The whole UI was designed against ~411 × 870 dp (Pixel-class) — letting
-/// it stretch across a desktop browser window broke the Home backdrop's
-/// "ground line" alignment with the Chibi position. We frame the web build
-/// in an AspectRatio so it always reads as a mobile app preview.
-const double _phoneAspectRatio = 411 / 870;
+/// Design-size dimensions used to constrain the app's render area on web.
+/// The UI was tuned against ~411 × 870 dp (Pixel-class) — letting it stretch
+/// across a desktop browser window broke the Home backdrop's "ground line"
+/// alignment with the Chibi position, and shrinking it to a small browser
+/// pane clipped fixed-position buttons (e.g. the bottom CTA on Choose-Chibi).
+///
+/// Strategy on the web `MaterialApp.builder`:
+///   • Viewport ≥ design size → AspectRatio frame, scales up proportionally.
+///   • Viewport < design size → fixed 411×870 design canvas, vertical scroll
+///     enabled so off-screen content is reachable.
+const double _phoneDesignWidth = 411;
+const double _phoneDesignHeight = 870;
+const double _phoneAspectRatio = _phoneDesignWidth / _phoneDesignHeight;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -70,16 +77,37 @@ class FocusPalApp extends StatelessWidget {
         ),
         builder: (context, child) {
           if (!kIsWeb || child == null) return child ?? const SizedBox();
-          // Letterbox the app inside a phone-aspect rectangle on the web
-          // so a desktop browser sees a mobile-app preview frame, with
-          // the same internal layout the on-device build was tuned for.
           return ColoredBox(
             color: const Color(0xFF0D1535),
-            child: Center(
-              child: AspectRatio(
-                aspectRatio: _phoneAspectRatio,
-                child: ClipRect(child: child),
-              ),
+            child: LayoutBuilder(
+              builder: (ctx, vp) {
+                final fitsViewport = vp.maxHeight >= _phoneDesignHeight &&
+                    vp.maxWidth >= _phoneDesignWidth;
+                if (fitsViewport) {
+                  // Big enough — scale a phone-aspect frame to the viewport.
+                  return Center(
+                    child: AspectRatio(
+                      aspectRatio: _phoneAspectRatio,
+                      child: ClipRect(child: child),
+                    ),
+                  );
+                }
+                // Smaller viewport (short laptop window etc.): render at the
+                // exact 411×870 design canvas and let the user scroll if
+                // anything extends past the visible area.
+                return Scrollbar(
+                  thumbVisibility: true,
+                  child: SingleChildScrollView(
+                    child: Center(
+                      child: SizedBox(
+                        width: _phoneDesignWidth,
+                        height: _phoneDesignHeight,
+                        child: ClipRect(child: child),
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           );
         },
